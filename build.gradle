@@ -1,0 +1,93 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+project.ext {
+    buildNum = System.getenv("BUILD_NUMBER")
+	mcVersion = "1.7.10"
+}
+
+version = "0.1.0"
+group= "k4unl.minecraft.twitchLive" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "twitchLive"
+
+
+minecraft {
+    version = "${project.ext.mcVersion}-10.13.0.1180"
+    
+	
+	// replacing stuff in the source
+    replace '@VERSION@', project.version
+    replace '@MC_VERSION@', version
+    replace '@BUILD_NUMBER@', project.ext.buildNum
+}
+
+// configure the source folders
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+                // exclude 'some exclusion'
+                // include 'some inclusion'
+        }
+        resources {
+            srcDir 'resources'
+                exclude '**/.md' // exclude readme from localization repo
+                // exclude 'some exclusion'
+                // include 'some inclusion'
+        }
+    }
+}
+
+processResources
+{
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        //include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+
+jar {
+    appendix = "${project.ext.mcVersion}"
+    classifier = "${project.ext.buildNum}"
+}
+
+task deobfJar(type: Jar) {
+    from(sourceSets.main.output) {
+        appendix = "${project.ext.mcVersion}"
+        classifier = "${project.ext.buildNum}-deobf"
+    }
+}
+
+
+artifacts {
+    archives deobfJar
+}

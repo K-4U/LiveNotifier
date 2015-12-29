@@ -17,24 +17,37 @@ buildscript {
 
 apply plugin: 'forge'
 
+
+repositories {
+    maven {
+        name "K4Repo"
+        url "http://maven.k-4u.nl"
+    }
+}
+
+
+dependencies {
+    compile "k4unl:k4lib:1.7.10-0.1.55:deobf"
+}
+
 project.ext {
     buildNum = System.getenv("BUILD_NUMBER")
-	mcVersion = "1.7.10"
+    mcVersion = "1.7.10"
 }
 
 version = "0.1.0"
-group= "k4unl.minecraft.twitchLive" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "twitchLive"
+group = "k4unl.minecraft.liveNotifier" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "liveNotifier"
+
 
 
 minecraft {
-    version = "${project.ext.mcVersion}-10.13.0.1180"
-    
-	
-	// replacing stuff in the source
-    replace '@VERSION@', project.version
-    replace '@MC_VERSION@', version
-    replace '@BUILD_NUMBER@', project.ext.buildNum
+    version = "${project.ext.mcVersion}-10.13.2.1230"
+
+    runDir = "../minecraft"
+
+    replace "@VERSION@", project.version
+    replace "@BUILDNUM@", project.ext.buildNum
 }
 
 // configure the source folders
@@ -42,52 +55,38 @@ sourceSets {
     main {
         java {
             srcDir 'src'
-                // exclude 'some exclusion'
-                // include 'some inclusion'
+            // exclude 'some exclusion'
+            // include 'some inclusion'
         }
         resources {
             srcDir 'resources'
-                exclude '**/.md' // exclude readme from localization repo
-                // exclude 'some exclusion'
-                // include 'some inclusion'
+            exclude '**/.md' // exclude readme from localization repo
+            // exclude 'some exclusion'
+            // include 'some inclusion'
         }
     }
 }
 
-processResources
-{
+processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        //include 'mcmod.info'
-                
+        include 'mcmod.info'
+
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
 }
 
-
 jar {
-    appendix = "${project.ext.mcVersion}"
-    classifier = "${project.ext.buildNum}"
+    classifier = "universal"
 }
 
-task deobfJar(type: Jar) {
-    from(sourceSets.main.output) {
-        appendix = "${project.ext.mcVersion}"
-        classifier = "${project.ext.buildNum}-deobf"
-    }
-}
-
-
-artifacts {
-    archives deobfJar
-}

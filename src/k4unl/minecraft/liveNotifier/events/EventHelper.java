@@ -1,10 +1,10 @@
 package k4unl.minecraft.liveNotifier.events;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
+
 import k4unl.minecraft.liveNotifier.LiveNotifier;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 /**
  * @author Koen Beckers (K-4U)
@@ -15,7 +15,6 @@ public class EventHelper {
 
     public static void init(){
         MinecraftForge.EVENT_BUS.register(new EventHelper());
-        FMLCommonHandler.instance().bus().register(new EventHelper());
     }
 
     @SubscribeEvent

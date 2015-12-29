@@ -4,13 +4,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import k4unl.minecraft.k4lib.lib.Functions;
 import k4unl.minecraft.liveNotifier.commands.Commands;
 import k4unl.minecraft.liveNotifier.events.EventHelper;
@@ -23,6 +16,11 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -41,7 +39,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class LiveNotifier {
 
-    @Instance(value = ModInfo.ID)
+    @Mod.Instance(value = ModInfo.ID)
     public static LiveNotifier instance;
     private File suggestedConfigurationFile;
 
@@ -50,7 +48,7 @@ public class LiveNotifier {
 
     private static final ThreadPoolExecutor threadPoolExecutor = new ScheduledThreadPoolExecutor(5, (new ThreadFactoryBuilder()).setNameFormat("ChannelChecker #%d").setDaemon(true).build());
 
-    @EventHandler
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 
         Log.init();
@@ -59,17 +57,17 @@ public class LiveNotifier {
         saveChannelsToFile();
     }
 
-    @EventHandler
+    @Mod.EventHandler
     public void load(FMLInitializationEvent event) {
         EventHelper.init();
     }
 
-    @EventHandler
+    @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
 
     }
 
-    @EventHandler
+    @Mod.EventHandler
     public void onServerStart(FMLServerStartingEvent event) {
 
         Commands.init(event);

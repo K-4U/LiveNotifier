@@ -7,6 +7,7 @@ import k4unl.minecraft.liveNotifier.LiveNotifier;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 
 import java.util.ArrayList;
@@ -61,9 +62,8 @@ public class CommandLiveNotifier extends CommandK4OpOnly {
         }
     }
 
-
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
 
         List<String> ret = new ArrayList<String>();
 

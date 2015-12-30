@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +51,8 @@ public class Beam {
                 jsonEnd += line;
                 Log.info(line);
             }
+        } catch (SocketException e){
+            Log.error("Beam is not playing nice: " + e.getMessage());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

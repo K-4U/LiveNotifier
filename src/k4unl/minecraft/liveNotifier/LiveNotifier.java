@@ -3,7 +3,6 @@ package k4unl.minecraft.liveNotifier;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -11,6 +10,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import com.google.gson.JsonSyntaxException;
 import k4unl.minecraft.k4lib.lib.Functions;
 import k4unl.minecraft.liveNotifier.commands.Commands;
 import k4unl.minecraft.liveNotifier.events.EventHelper;
@@ -25,7 +25,6 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.world.WorldServer;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +42,9 @@ public class LiveNotifier {
 
     @Instance(value = ModInfo.ID)
     public static LiveNotifier instance;
-    private File suggestedConfigurationFile;
+    private       File         suggestedConfigurationFile;
 
-    public List<LiveChannel> channels = new ArrayList<LiveChannel>();
+    public Settings     settings     = new Settings();
     public List<String> liveChannels = new ArrayList<String>();
 
     private static final ThreadPoolExecutor threadPoolExecutor = new ScheduledThreadPoolExecutor(5, (new ThreadFactoryBuilder()).setNameFormat("ChannelChecker #%d").setDaemon(true).build());
@@ -77,7 +76,7 @@ public class LiveNotifier {
 
 
     public void readChannelsFromFile() {
-        channels.clear();
+        settings.clear();
         File dir = suggestedConfigurationFile;
         if (dir != null) {
             Gson gson = new Gson();
@@ -95,20 +94,21 @@ public class LiveNotifier {
                 BufferedReader bReader = new BufferedReader(reader);
                 String json = "";
                 String line;
-                while((line = bReader.readLine()) != null){
+                while ((line = bReader.readLine()) != null) {
                     json += line;
                 }
                 reader.close();
                 ipStream.close();
                 bReader.close();
 
-                Type myTypeMap = new TypeToken<List<LiveChannel>>() {}.getType();
-                channels = gson.fromJson(json, myTypeMap);
-                if (channels == null) {
-                    channels = generateExampleChannel();
+                settings = gson.fromJson(json, Settings.class);
+                if (settings == null) {
+                    settings = generateExampleSettings();
                 }
 
                 //Log.info("Read from file: " + json);
+            } catch (JsonSyntaxException e) {
+                settings = generateExampleSettings();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -119,8 +119,16 @@ public class LiveNotifier {
         }
     }
 
+    private Settings generateExampleSettings() {
+        Settings ret = new Settings();
+        ret.setChannels(generateExampleChannel());
+        ret.addFilter("FTB");
+        ret.setDelay(10);
+        return ret;
+    }
+
     private List<LiveChannel> generateExampleChannel() {
-        LiveChannel toAdd = new LiveChannel("Channel Name", StreamingService.TWITCH, true, true, true, true);
+        LiveChannel toAdd = new LiveChannel("Channel Name", StreamingService.TWITCH, true, true, true, true, "", false);
         List<LiveChannel> ret = new ArrayList<LiveChannel>();
 
         ret.add(toAdd);
@@ -131,7 +139,7 @@ public class LiveNotifier {
         File dir = suggestedConfigurationFile;
         if (dir != null) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String json = gson.toJson(channels);
+            String json = gson.toJson(settings);
             if (!dir.exists()) {
                 try {
                     dir.createNewFile();
@@ -151,67 +159,72 @@ public class LiveNotifier {
     }
 
 
-
     private Runnable channelChecker = new Runnable() {
         @Override
         public void run() {
             threadPoolExecutor.remove(this);
-            for (LiveChannel channel: channels) {
+            for (LiveChannel channel : settings.getChannels()) {
                 boolean isLive = false;
                 String game = "";
                 String title = "";
-                if(channel.getService().equals(StreamingService.TWITCH)) {
+                if (channel.getService().equals(StreamingService.TWITCH)) {
                     isLive = Twitch.isLive(channel.getChannelName());
-                    if(isLive){
+                    if (isLive) {
                         Map<String, Object> streamData = Twitch.getStreamData(channel.getChannelName());
                         game = streamData.get("game").toString();
-                        title = ((Map<String,Object>)streamData.get("channel")).get("status").toString();
+                        title = ((Map<String, Object>) streamData.get("channel")).get("status").toString();
                     }
                 }
-                if(channel.getService().equals(StreamingService.BEAM)){
+                if (channel.getService().equals(StreamingService.BEAM)) {
                     isLive = Beam.isLive(channel.getChannelName());
-                    if(isLive){
+                    if (isLive) {
                         Map<String, Object> streamData = Beam.getChannelFromOwnerName(channel.getChannelName());
                         game = ((Map<String, Object>) streamData.get("type")).get("name").toString();
                         title = streamData.get("name").toString();
                     }
                 }
 
-                if(isLive) {
+                if (isLive) {
                     if (!liveChannels.contains(channel.getChannelName())) {
-                        //Started streaming!
-                        liveChannels.add(channel.getChannelName());
-                        if(channel.isAnnounce()) {
-                            //Announce it:
-                            ChatComponentText msg = new ChatComponentText("");
-                            msg.appendSibling(new ChatComponentText(channel.getChannelName().substring(0, 1).toUpperCase() + channel.getChannelName().substring(1) + " has started streaming on " + channel.getService().getName() + " :: "));
+                        //Check if the filter works.
+                        boolean doAdd = true;
+                        doAdd = checkFilters(title, channel);
 
-                            if(channel.isAnnounceGame()){
-                                msg.appendSibling(new ChatComponentText("They are playing " + game + " :: "));
-                            }
-                            if(channel.isAnnounceTitle()){
-                                msg.appendSibling(new ChatComponentText("The title is: " + title + " :: "));
-                            }
+                        if(doAdd) {
+                            //Started streaming!
+                            liveChannels.add(channel.getChannelName());
+                            if (channel.isAnnounce()) {
+                                //Announce it:
+                                ChatComponentText msg = new ChatComponentText("");
+                                msg.appendSibling(new ChatComponentText(channel.getChannelName().substring(0, 1).toUpperCase() + channel.getChannelName().substring(1) + " has started streaming on " + channel.getService().getName() + " :: "));
 
-                            if(channel.isAllowLink()) {
-                                msg.appendSibling(new ChatComponentText("Click "));
-                                IChatComponent link = new ChatComponentText("here");
-                                link.getChatStyle().setColor(EnumChatFormatting.BLUE);
-                                link.getChatStyle().setUnderlined(true);
-                                link.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, channel.getService().getUrl() + channel.getChannelName()));
-                                link.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(channel.getService().getUrl() + channel.getChannelName())));
+                                if (channel.isAnnounceGame()) {
+                                    msg.appendSibling(new ChatComponentText("They are playing " + game + " :: "));
+                                }
+                                if (channel.isAnnounceTitle()) {
+                                    msg.appendSibling(new ChatComponentText("The title is: " + title + " :: "));
+                                }
 
-                                msg.appendSibling(link);
-                                msg.appendSibling(new ChatComponentText(" to watch"));
-                            }
+                                if (channel.isAllowLink()) {
+                                    msg.appendSibling(new ChatComponentText("Click "));
+                                    IChatComponent link = new ChatComponentText("here");
+                                    link.getChatStyle().setColor(EnumChatFormatting.BLUE);
+                                    link.getChatStyle().setUnderlined(true);
+                                    link.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, channel.getService().getUrl() + channel.getChannelName()));
+                                    link.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(channel.getService().getUrl() + channel.getChannelName())));
 
-                            for (WorldServer w : MinecraftServer.getServer().worldServers) {
-                                Functions.sendChatMessageServerWide(w, msg);
+                                    msg.appendSibling(link);
+                                    msg.appendSibling(new ChatComponentText(" to watch"));
+                                }
+
+                                for (WorldServer w : MinecraftServer.getServer().worldServers) {
+                                    Functions.sendChatMessageServerWide(w, msg);
+                                }
                             }
                         }
                     }
-                }else{
-                    if(liveChannels.contains(channel.getChannelName())){
+                } else {
+                    if (liveChannels.contains(channel.getChannelName())) {
                         liveChannels.remove(channel.getChannelName());
                         //No longer streaming.
                     }
@@ -220,6 +233,25 @@ public class LiveNotifier {
         }
     };
 
+    private boolean checkFilters(String title, LiveChannel channel) {
+        List<String> toCheck;
+        if(channel.getOverrideFilter() || settings.getFilters().size() == 0){
+            toCheck = channel.getFilters();
+        }else{
+            toCheck = settings.getFilters();
+        }
+        for(String filter : toCheck){
+            if(title.toLowerCase().matches(filter)){
+                return true;
+            }
+        }
+        for(String filter : toCheck){
+            if(title.toLowerCase().contains(filter.toLowerCase())){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void recheckChannels() {
         threadPoolExecutor.submit(channelChecker);

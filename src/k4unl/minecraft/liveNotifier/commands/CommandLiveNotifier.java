@@ -44,15 +44,15 @@ public class CommandLiveNotifier extends CommandK4OpOnly {
                     }
                 }
             } else if (args[0].equalsIgnoreCase("load")) {
-                if (sender instanceof DedicatedServer) {
+                /*if (sender instanceof DedicatedServer) {
                     LiveNotifier.instance.readChannelsFromFile();
                     sender.addChatMessage(new ChatComponentText("Channels reloaded from disk"));
-                } else {
+                } else {*/
                     if (Functions.isPlayerOpped(((EntityPlayer) sender).getGameProfile())) {
                         LiveNotifier.instance.readChannelsFromFile();
-                        sender.addChatMessage(new ChatComponentText("Channels reloaded from disk"));
+                        sender.addChatMessage(new ChatComponentText(LiveNotifier.instance.settings.getChannels().size() + " channels reloaded from disk"));
                     }
-                }
+                //}
             } else if (args[0].equalsIgnoreCase("check")) {
                 LiveNotifier.instance.recheckChannels();
             } else if (args[0].equalsIgnoreCase("clear")) {

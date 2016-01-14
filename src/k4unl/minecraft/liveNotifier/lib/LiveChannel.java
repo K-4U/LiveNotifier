@@ -1,24 +1,32 @@
 package k4unl.minecraft.liveNotifier.lib;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Koen Beckers (K-4U)
  */
 public class LiveChannel {
 
-    private String channelName;
+    private String           channelName;
     private StreamingService service;
-    private boolean announce = true;
-    private boolean announceGame = true;
-    private boolean allowLink = true;
-    private boolean announceTitle = true;
+    private boolean      announce       = true;
+    private boolean      announceGame   = true;
+    private boolean      allowLink      = true;
+    private boolean      announceTitle  = true;
+    private List<String> filters        = new ArrayList<String>();
+    private boolean      overrideFilter = false;
 
-    public LiveChannel(String channelName, StreamingService service, boolean announce, boolean announceGame, boolean allowLink, boolean announceTitle) {
+    public LiveChannel(String channelName, StreamingService service, boolean announce, boolean announceGame, boolean allowLink, boolean announceTitle, String filter, boolean overrideFilter) {
         this.channelName = channelName;
         this.service = service;
         this.announce = announce;
         this.announceGame = announceGame;
         this.allowLink = allowLink;
         this.announceTitle = announceTitle;
+        this.filters.add(filter);
+        this.overrideFilter = overrideFilter;
+
     }
 
     public String getChannelName() {
@@ -67,5 +75,17 @@ public class LiveChannel {
 
     public void setAnnounceTitle(boolean announceTitle) {
         this.announceTitle = announceTitle;
+    }
+
+    public List<String> getFilters() {
+        return filters;
+    }
+
+    public void setFilters(List<String> filters) {
+        this.filters = filters;
+    }
+
+    public boolean getOverrideFilter() {
+        return overrideFilter;
     }
 }

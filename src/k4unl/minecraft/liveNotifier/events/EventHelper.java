@@ -22,7 +22,7 @@ public class EventHelper {
         if(event.phase == TickEvent.Phase.END) {
             if(event.side.isServer()){
                 ticksPassed++;
-                if(ticksPassed == 12000){
+                if(ticksPassed == 20 * 60 * LiveNotifier.instance.settings.getDelay()){
                     ticksPassed = 0;
                     LiveNotifier.instance.recheckChannels();
                 }

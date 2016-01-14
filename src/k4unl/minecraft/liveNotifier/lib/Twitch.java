@@ -32,14 +32,14 @@ public class Twitch {
         try {
 
             URL toFetch = new URL(twitchAPI + url);
-            Log.info("Fetching " + toFetch.toString());
+            //Log.info("Fetching " + toFetch.toString());
 
             BufferedReader in = new BufferedReader(new InputStreamReader(toFetch.openStream()));
 
             String line;
             while((line = in.readLine()) != null){
                 jsonEnd += line;
-                Log.info(line);
+                //Log.info(line);
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();

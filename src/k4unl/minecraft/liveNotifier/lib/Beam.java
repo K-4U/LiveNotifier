@@ -42,14 +42,14 @@ public class Beam {
         try {
 
             URL toFetch = new URL(url);
-            Log.info("Fetching " + toFetch.toString());
+            //Log.info("Fetching " + toFetch.toString());
 
             BufferedReader in = new BufferedReader(new InputStreamReader(toFetch.openStream()));
 
             String line;
             while ((line = in.readLine()) != null) {
                 jsonEnd += line;
-                Log.info(line);
+                //Log.info(line);
             }
         } catch (SocketException e){
             Log.error("Beam is not playing nice: " + e.getMessage());
@@ -124,7 +124,7 @@ public class Beam {
     public static boolean isLive(String channelName) {
         Map<String, Object> channel = getChannelFromOwnerName(channelName);
 
-        Log.info("Fetched channel object");
+        //Log.info("Fetched channel object");
         return Boolean.valueOf(channel.get("online").toString());
     }
 }

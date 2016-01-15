@@ -14,17 +14,16 @@ public class LiveChannel {
     private boolean      announceGame   = true;
     private boolean      allowLink      = true;
     private boolean      announceTitle  = true;
-    private List<String> filters        = new ArrayList<String>();
+    private List<Filter> filters        = new ArrayList<Filter>();
     private boolean      overrideFilter = false;
 
-    public LiveChannel(String channelName, StreamingService service, boolean announce, boolean announceGame, boolean allowLink, boolean announceTitle, String filter, boolean overrideFilter) {
+    public LiveChannel(String channelName, StreamingService service, boolean announce, boolean announceGame, boolean allowLink, boolean announceTitle, boolean overrideFilter) {
         this.channelName = channelName;
         this.service = service;
         this.announce = announce;
         this.announceGame = announceGame;
         this.allowLink = allowLink;
         this.announceTitle = announceTitle;
-        this.filters.add(filter);
         this.overrideFilter = overrideFilter;
 
     }
@@ -77,12 +76,16 @@ public class LiveChannel {
         this.announceTitle = announceTitle;
     }
 
-    public List<String> getFilters() {
+    public List<Filter> getFilters() {
         return filters;
     }
 
-    public void setFilters(List<String> filters) {
+    public void setFilters(List<Filter> filters) {
         this.filters = filters;
+    }
+
+    public void addToFilter(String filter, boolean regex){
+        this.filters.add(new Filter(filter, regex));
     }
 
     public boolean getOverrideFilter() {

@@ -6,7 +6,6 @@ import k4unl.minecraft.k4lib.lib.config.ModInfo;
 import k4unl.minecraft.liveNotifier.LiveNotifier;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.util.ChatComponentText;
 
 import java.util.ArrayList;
@@ -35,28 +34,22 @@ public class CommandLiveNotifier extends CommandK4OpOnly {
         if (args.length >= 1) {
             if (args[0].equalsIgnoreCase("version")) {
                 sender.addChatMessage(new ChatComponentText("LiveNotifier version " + ModInfo.VERSION));
-            } else if (args[0].equalsIgnoreCase("save")) {
-                if (sender instanceof DedicatedServer) {
-                    LiveNotifier.instance.saveChannelsToFile();
-                } else {
-                    if (Functions.isPlayerOpped(((EntityPlayer) sender).getGameProfile())) {
-                        LiveNotifier.instance.saveChannelsToFile();
-                    }
-                }
             } else if (args[0].equalsIgnoreCase("load")) {
-                /*if (sender instanceof DedicatedServer) {
+                if (sender.getCommandSenderName().equals("Server")) {
                     LiveNotifier.instance.readChannelsFromFile();
-                    sender.addChatMessage(new ChatComponentText("Channels reloaded from disk"));
-                } else {*/
+                    sender.addChatMessage(new ChatComponentText(LiveNotifier.instance.settings.getChannels().size() + " channels reloaded from disk"));
+                } else {
                     if (Functions.isPlayerOpped(((EntityPlayer) sender).getGameProfile())) {
                         LiveNotifier.instance.readChannelsFromFile();
                         sender.addChatMessage(new ChatComponentText(LiveNotifier.instance.settings.getChannels().size() + " channels reloaded from disk"));
                     }
-                //}
+                }
             } else if (args[0].equalsIgnoreCase("check")) {
                 LiveNotifier.instance.recheckChannels();
+                sender.addChatMessage(new ChatComponentText("Channels check started"));
             } else if (args[0].equalsIgnoreCase("clear")) {
                 LiveNotifier.instance.liveChannels.clear();
+                sender.addChatMessage(new ChatComponentText("List cleared"));
             }
         }
     }

@@ -122,13 +122,13 @@ public class LiveNotifier {
     private Settings generateExampleSettings() {
         Settings ret = new Settings();
         ret.setChannels(generateExampleChannel());
-        ret.addFilter("FTB");
+        ret.addFilter(".*(ftb).*", true);
         ret.setDelay(10);
         return ret;
     }
 
     private List<LiveChannel> generateExampleChannel() {
-        LiveChannel toAdd = new LiveChannel("Channel Name", StreamingService.TWITCH, true, true, true, true, "", false);
+        LiveChannel toAdd = new LiveChannel("K4Unl", StreamingService.TWITCH, true, true, true, true, false);
         List<LiveChannel> ret = new ArrayList<LiveChannel>();
 
         ret.add(toAdd);
@@ -234,22 +234,18 @@ public class LiveNotifier {
     };
 
     private boolean checkFilters(String title, LiveChannel channel) {
-        List<String> toCheck;
+        List<Filter> toCheck;
         if(channel.getOverrideFilter() || settings.getFilters().size() == 0){
             toCheck = channel.getFilters();
         }else{
             toCheck = settings.getFilters();
         }
-        for(String filter : toCheck){
-            if(title.toLowerCase().matches(filter)){
+        for(Filter filter : toCheck){
+            if(filter.matches(title)){
                 return true;
             }
         }
-        for(String filter : toCheck){
-            if(title.toLowerCase().contains(filter.toLowerCase())){
-                return true;
-            }
-        }
+
         return false;
     }
 

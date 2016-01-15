@@ -9,7 +9,7 @@ import java.util.List;
 public class Settings {
 
     private List<LiveChannel> channels = new ArrayList<LiveChannel>();
-    private List<String>      filters  = new ArrayList<String>();
+    private List<Filter>      filters  = new ArrayList<Filter>();
     private int               delay    = 10;
 
     public List<LiveChannel> getChannels() {
@@ -20,17 +20,17 @@ public class Settings {
         this.channels = channels;
     }
 
-    public void addFilter(String filter) {
-        if (!filter.equals(""))
-            filters.add(filter);
-
+    public void addFilter(String filter, boolean regex) {
+        if (!filter.equals("")) {
+            filters.add(new Filter(filter, regex));
+        }
     }
 
-    public List<String> getFilters() {
+    public List<Filter> getFilters() {
         return filters;
     }
 
-    public void setFilters(List<String> filters) {
+    public void setFilters(List<Filter> filters) {
         this.filters = filters;
     }
 

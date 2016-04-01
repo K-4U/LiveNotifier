@@ -9,13 +9,11 @@ import k4unl.minecraft.liveNotifier.commands.Commands;
 import k4unl.minecraft.liveNotifier.events.EventHelper;
 import k4unl.minecraft.liveNotifier.lib.*;
 import k4unl.minecraft.liveNotifier.lib.config.ModInfo;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.event.HoverEvent;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.world.WorldServer;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -43,7 +41,7 @@ public class LiveNotifier {
     private       File         suggestedConfigurationFile;
 
     public Settings     settings     = new Settings();
-    public List<String> liveChannels = new ArrayList<String>();
+    public List<String> liveChannels = new ArrayList<>();
 
     private static final ThreadPoolExecutor threadPoolExecutor = new ScheduledThreadPoolExecutor(5, (new ThreadFactoryBuilder()).setNameFormat("ChannelChecker #%d").setDaemon(true).build());
 
@@ -193,31 +191,29 @@ public class LiveNotifier {
                             liveChannels.add(channel.getChannelName());
                             if (channel.isAnnounce()) {
                                 //Announce it:
-                                ChatComponentText msg = new ChatComponentText("");
-                                msg.appendSibling(new ChatComponentText(channel.getChannelName().substring(0, 1).toUpperCase() + channel.getChannelName().substring(1) + " has started streaming on " + channel.getService().getName() + " :: "));
+                                TextComponentString msg = new TextComponentString("");
+                                msg.appendSibling(new TextComponentString(channel.getChannelName().substring(0, 1).toUpperCase() + channel.getChannelName().substring(1) + " has started streaming on " + channel.getService().getName() + " :: "));
 
                                 if (channel.isAnnounceGame()) {
-                                    msg.appendSibling(new ChatComponentText("They are playing " + game + " :: "));
+                                    msg.appendSibling(new TextComponentString("They are playing " + game + " :: "));
                                 }
                                 if (channel.isAnnounceTitle()) {
-                                    msg.appendSibling(new ChatComponentText("The title is: " + title + " :: "));
+                                    msg.appendSibling(new TextComponentString("The title is: " + title + " :: "));
                                 }
 
                                 if (channel.isAllowLink()) {
-                                    msg.appendSibling(new ChatComponentText("Click "));
-                                    IChatComponent link = new ChatComponentText("here");
-                                    link.getChatStyle().setColor(EnumChatFormatting.BLUE);
-                                    link.getChatStyle().setUnderlined(true);
-                                    link.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, channel.getService().getUrl() + channel.getChannelName()));
-                                    link.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(channel.getService().getUrl() + channel.getChannelName())));
+                                    msg.appendSibling(new TextComponentString("Click "));
+                                    ITextComponent link = new TextComponentString("here");
+                                    link.getStyle().setColor(TextFormatting.BLUE);
+                                    link.getStyle().setUnderlined(true);
+                                    link.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, channel.getService().getUrl() + channel.getChannelName()));
+                                    link.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(channel.getService().getUrl() + channel.getChannelName())));
 
                                     msg.appendSibling(link);
-                                    msg.appendSibling(new ChatComponentText(" to watch"));
+                                    msg.appendSibling(new TextComponentString(" to watch"));
                                 }
 
-                                for (WorldServer w : MinecraftServer.getServer().worldServers) {
-                                    Functions.sendChatMessageServerWide(w, msg);
-                                }
+                                Functions.sendChatMessageServerWide(msg);
                             }
                         }
                     }

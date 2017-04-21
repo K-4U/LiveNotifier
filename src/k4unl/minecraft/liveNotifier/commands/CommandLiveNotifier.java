@@ -22,13 +22,13 @@ public class CommandLiveNotifier extends CommandK4OpOnly {
     }
 
     @Override
-    public String getCommandName() {
+    public String getName() {
 
         return "livenotifier";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender p_71518_1_) {
+    public String getUsage(ICommandSender p_71518_1_) {
 
         return "";
     }
@@ -38,29 +38,29 @@ public class CommandLiveNotifier extends CommandK4OpOnly {
 
         if (args.length >= 1) {
             if (args[0].equalsIgnoreCase("version")) {
-                sender.addChatMessage(new TextComponentString("LiveNotifier version " + ModInfo.VERSION));
+                sender.sendMessage(new TextComponentString("LiveNotifier version " + ModInfo.VERSION));
             } else if (args[0].equalsIgnoreCase("load")) {
                 if (sender.getName().equals("Server")) {
                     LiveNotifier.instance.readChannelsFromFile();
-                    sender.addChatMessage(new TextComponentString(LiveNotifier.instance.settings.getChannels().size() + " channels reloaded from disk"));
+                    sender.sendMessage(new TextComponentString(LiveNotifier.instance.settings.getChannels().size() + " channels reloaded from disk"));
                 } else {
                     if (Functions.isPlayerOpped(((EntityPlayer) sender).getGameProfile())) {
                         LiveNotifier.instance.readChannelsFromFile();
-                        sender.addChatMessage(new TextComponentString(LiveNotifier.instance.settings.getChannels().size() + " channels reloaded from disk"));
+                        sender.sendMessage(new TextComponentString(LiveNotifier.instance.settings.getChannels().size() + " channels reloaded from disk"));
                     }
                 }
             } else if (args[0].equalsIgnoreCase("check")) {
                 LiveNotifier.instance.recheckChannels();
-                sender.addChatMessage(new TextComponentString("Channels check started"));
+                sender.sendMessage(new TextComponentString("Channels check started"));
             } else if (args[0].equalsIgnoreCase("clear")) {
                 LiveNotifier.instance.liveChannels.clear();
-                sender.addChatMessage(new TextComponentString("List cleared"));
+                sender.sendMessage(new TextComponentString("List cleared"));
             }
         }
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
 
         List<String> ret = new ArrayList<>();
 

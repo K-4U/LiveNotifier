@@ -21,7 +21,7 @@ apply plugin: 'forge'
 repositories {
     maven {
         name "K4Repo"
-        url "http://maven.k-4u.nl"
+        url "http://modmaven.k-4u.nl"
     }
 }
 

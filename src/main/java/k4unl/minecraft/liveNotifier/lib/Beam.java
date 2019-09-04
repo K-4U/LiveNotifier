@@ -1,9 +1,5 @@
 package k4unl.minecraft.liveNotifier.lib;
 
-import com.google.common.base.Joiner;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,11 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Joiner;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 /**
  * @author Koen Beckers (K-4U)
  */
 public class Beam {
-    private static final String beamUrl = "https://beam.pro";
+	private static final String beamUrl = "https://mixer.com";
     private static final String apiUrl = "/api/v1";
 
     private static Gson nGson = new Gson();

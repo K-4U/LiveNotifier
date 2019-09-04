@@ -3,8 +3,8 @@ package k4unl.minecraft.liveNotifier.events;
 
 import k4unl.minecraft.liveNotifier.LiveNotifier;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
  * @author Koen Beckers (K-4U)

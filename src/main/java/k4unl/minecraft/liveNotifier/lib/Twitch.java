@@ -1,8 +1,5 @@
 package k4unl.minecraft.liveNotifier.lib;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,6 +9,9 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * @author Koen Beckers (K-4U)
@@ -26,7 +26,7 @@ public class Twitch {
         //Quickly fetch the client ID from the website of K-4U:
         Log.info("Fetching twitch Client ID from K-4U.eu");
         try{
-            URL toFetch = new URL("http://www.k-4u.eu/twitchid.txt");
+	        URL toFetch = new URL("https://www.k-4u.eu/twitchid.txt");
             
             BufferedReader in = new BufferedReader(new InputStreamReader(toFetch.openStream()));
             

@@ -1,9 +1,10 @@
 package k4unl.minecraft.liveNotifier.lib;
 
-import k4unl.minecraft.k4lib.lib.config.ModInfo;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import k4unl.minecraft.k4lib.lib.config.ModInfo;
 
 public class Log {
     private static Logger logger = LogManager.getLogger(ModInfo.ID);
